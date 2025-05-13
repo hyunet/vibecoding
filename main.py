@@ -45,7 +45,7 @@ if mbti:
 
     st.success("🔍 추천 정보 도착!")
     st.markdown("---")
-    st.subheader(f"🎉 "{mbti}" 유형에 맞는 진로 정보입니다!")
+    st.subheader(f"🎉 \"{mbti}\" 유형에 맞는 진로 정보입니다!")
 
     data = career_data.get(mbti)
     if data:
