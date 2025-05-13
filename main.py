@@ -1,6 +1,15 @@
 import streamlit as st
 import random
 import time
+st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+
+        html, body, [class*="css"]  {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # MBTI와 추천 직업, 과목, 학과, 학습 팁 매핑
 career_data = {
