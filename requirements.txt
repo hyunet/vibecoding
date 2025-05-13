@@ -1,3 +1,7 @@
 plotly
 folium
 koreanize_matplotlib
+streamlit
+pandas
+matplotlib
+seaborn
