@@ -1,83 +1,146 @@
 import streamlit as st
-import random 
-import time
-st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+import heapq
 
-        html, body, [class*="css"]  {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-    </style>
-""", unsafe_allow_html=True)
+st.set_page_config(page_title="지속가능발전목표 기반 데이터 구조 프로젝트", layout="wide")
 
-# MBTI와 추천 직업, 과목, 학과, 학습 팁 매핑
-career_data = {
-    "INTJ": {
-        "jobs": ["데이터 과학자 🚀", "전략 컨설턴트 🌎", "UX 디자이너 🖼️"],
-        "subjects": ["수학Ⅰ/Ⅱ", "확률과 통계", "정보", "융합과학"],
-        "majors": ["컴퓨터공학과", "산업공학과", "디자인학과"],
-        "tips": "계획을 세우고 혼자 깊이 있게 탐구하는 학습 방식이 잘 맞아요. 구조화된 개념 정리 노트를 만들어보세요."
-    },
-    "INFP": {
-        "jobs": ["작가 🌟", "심리상담사 🩵", "사회운동가 🌍"],
-        "subjects": ["문학", "심리학", "윤리와 사상", "언어와 매체"],
-        "majors": ["심리학과", "문예창작과", "사회복지학과"],
-        "tips": "감정과 직관에 의존하는 편이라 글쓰기나 토론을 통한 표현 학습이 좋아요. 목표를 시각화해보는 것도 도움이 됩니다."
-    },
-    "ENTP": {
-        "jobs": ["기획자 📋", "창업가 🚀", "광고 크리에이터 🎬"],
-        "subjects": ["경제", "정치와 법", "미디어와 표현", "창의적 체험활동"],
-        "majors": ["경영학과", "광고홍보학과", "창업학과"],
-        "tips": "새로운 아이디어를 실현하는 데 강하므로 프로젝트 기반 학습과 발표활동이 매우 효과적입니다."
-    },
-    # 다른 MBTI도 동일하게 확장 가능
+st.title("🌍 지속가능발전목표(SDG) 기반 데이터 구조 프로젝트")
+st.markdown("---")
+
+st.header("📌 프로젝트 개요")
+st.write("""
+이 프로젝트는 지속가능발전목표(SDG)를 달성하기 위한 데이터 기반 분석과 자료구조/알고리즘을 접목하여, 다양한 사회 문제의 해결 방안을 제시합니다. 아래의 사례들을 통해 데이터를 수집, 시각화하고, 효율적인 알고리즘 설계를 수행합니다.
+""")
+
+st.markdown("---")
+
+# 사례 1: 트리 구조 기반 에너지 모니터링
+st.subheader("1️⃣ 트리 구조 기반 에너지 모니터링")
+st.write("""
+에너지 소비 데이터를 트리 구조로 표현하여 지역별 사용 흐름을 분석하고, 불필요한 낭비를 줄이기 위한 구조를 설계합니다.
+""")
+
+energy_tree = {
+    "국가": ["서울", "부산"],
+    "서울": ["강남구", "마포구"],
+    "부산": ["해운대구", "사하구"],
+    "강남구": [],
+    "마포구": [],
+    "해운대구": [],
+    "사하구": []
 }
 
-# 페이지 제목 꾸미기
-st.markdown("""
-    <h1 style='text-align: center; color: #ff69b4;'>
-        🌟 MBTI 기반 진로·과목 추천 시스템 🌟
-    </h1>
-    <h4 style='text-align: center; color: #f08080;'>
-        당신의 MBTI에 맞는 직업, 선택과목, 관련 학과, 공부법을 알려드려요! 🎓
-    </h4>
-""", unsafe_allow_html=True)
+def display_tree(node, level=0):
+    st.text("  " * level + "- " + node)
+    for child in energy_tree.get(node, []):
+        display_tree(child, level + 1)
 
-# 사용자 입력
-mbti = st.selectbox("💡 MBTI를 선택해주세요:", list(career_data.keys()))
+st.text("에너지 소비 트리 구조")
+display_tree("국가")
 
-# 결과 출력
-if mbti:
-    with st.spinner("✨ 당신에게 딱 맞는 진로 정보를 불러오고 있어요..."):
-        time.sleep(1.5)
+st.markdown("---")
 
-    st.success("🔍 추천 정보 도착!")
-    st.markdown("---")
-    st.subheader(f"🎉 \"{mbti}\" 유형에 맞는 진로 정보입니다!")
+# 사례 2: 그래프 구조 및 BFS + 다익스트라 알고리즘
+st.subheader("2️⃣ 교통 흐름 분석: 그래프 + BFS + 다익스트라")
+st.write("""
+시간대별 교통량 데이터를 그래프 구조로 모델링하고, 너비 우선 탐색(BFS) 및 다익스트라 알고리즘으로 최적 경로 및 혼잡도 예측을 수행합니다.
+""")
 
-    data = career_data.get(mbti)
-    if data:
-        st.markdown("#### 💼 추천 직업")
-        for job in data["jobs"]:
-            st.markdown(f"- {job}")
+G = nx.Graph()
+edges = [
+    ("A", "B", 3),
+    ("B", "C", 2),
+    ("A", "D", 1),
+    ("D", "C", 4),
+    ("C", "E", 1),
+]
+for u, v, w in edges:
+    G.add_edge(u, v, weight=w)
 
-        st.markdown("#### 📚 추천 선택 과목")
-        st.markdown(", ".join(data["subjects"]))
+pos = nx.spring_layout(G)
+nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, font_size=15)
+labels = nx.get_edge_attributes(G, 'weight')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+st.pyplot(plt.gcf())
 
-        st.markdown("#### 🎓 관련 대학 학과")
-        st.markdown(", ".join(data["majors"]))
+st.write("#### 🔍 다익스트라 최단 거리 예시")
+def dijkstra(graph, start):
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
+    pq = [(0, start)]
+    while pq:
+        current_distance, current_node = heapq.heappop(pq)
+        if current_distance > distances[current_node]:
+            continue
+        for neighbor in graph[current_node]:
+            weight = graph[current_node][neighbor].get('weight', 1)
+            distance = current_distance + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+    return distances
 
-        st.markdown("#### 🧠 학습 팁")
-        st.info(data["tips"])
+st.json(dijkstra(dict(G), 'A'))
 
-        st.balloons()
-        st.toast("모든 추천 정보를 확인했어요! 🌟")
+st.markdown("---")
 
-# 하단 정보
-st.markdown("""
-    <hr>
-    <p style='text-align: center; color: #aaa;'>
-        🌺 제작: <strong>MBTI Career Recommender+</strong> | 고등학생을 위한 맞춤 진로 탐색 도우미 💡
-    </p>
-""", unsafe_allow_html=True)
+# 사례 3: 식량 소비 패턴 및 정렬
+st.subheader("3️⃣ 식량 소비 패턴 분석: 정렬 알고리즘")
+st.write("""
+식량 소비 패턴 데이터를 기반으로 유통기한순으로 식품을 정렬하고, 빠른 검색을 위한 탐색 알고리즘을 적용합니다.
+""")
+
+food_data = [
+    {"식품": "쌀", "유통기한": 10},
+    {"식품": "라면", "유통기한": 3},
+    {"식품": "통조림", "유통기한": 24},
+    {"식품": "계란", "유통기한": 1}
+]
+
+st.write("#### 🗂 원본 데이터")
+st.dataframe(pd.DataFrame(food_data))
+
+st.write("#### ⏳ 유통기한 기준 정렬 결과 (머지 정렬)")
+def merge_sort(data):
+    if len(data) <= 1:
+        return data
+    mid = len(data) // 2
+    left = merge_sort(data[:mid])
+    right = merge_sort(data[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    while left and right:
+        if left[0]['유통기한'] < right[0]['유통기한']:
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0))
+    result += left + right
+    return result
+
+sorted_food = merge_sort(food_data.copy())
+st.dataframe(pd.DataFrame(sorted_food))
+
+st.markdown("---")
+
+# 사례 4: 재난 피해 지역 지원 최적화
+st.subheader("4️⃣ 재난 피해 최소화: 피해 규모 정렬 및 자원 분배")
+st.write("""
+피해 규모가 큰 지역을 우선 지원하기 위해 정렬 알고리즘을 활용하고, 자원 분배 알고리즘을 설계합니다.
+""")
+
+disaster_data = [
+    {"지역": "X", "피해 규모": 80},
+    {"지역": "Y", "피해 규모": 45},
+    {"지역": "Z", "피해 규모": 95},
+    {"지역": "W", "피해 규모": 30},
+]
+sorted_disaster = sorted(disaster_data, key=lambda x: -x["피해 규모"])
+st.dataframe(pd.DataFrame(sorted_disaster))
+
+st.markdown("---")
+
+st.success("이 프로젝트는 다양한 문제 해결에 있어 자료구조 및 알고리즘의 실제적 활용 사례를 보여줍니다. 지속가능한 사회를 위한 데이터 과학 기반 접근 방식의 중요성을 강조합니다.")
