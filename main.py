@@ -1,7 +1,7 @@
 # main.py
 import streamlit as st
 from pages import sdg7_energy, sdg11_traffic, sdg12_food
-
+ 
 st.set_page_config(page_title="SDGs 기반 정보과학 프로젝트", layout="wide")
 
 PAGES = {
